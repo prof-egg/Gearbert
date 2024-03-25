@@ -1,0 +1,16 @@
+{
+    "clientPresence": "Stargound",
+    "error": {
+        "commandError": "Sorry this doesn't seem to be working at the moment. Please try again later.",
+        "userNoTestingRights": "Sorry! This command is currently in testing!"
+    },
+    "links": [
+        ["GDD", "https://docs.google.com/document/d/1ZgudITcZjBL1ZESWd6z1rGSq-IGFlPLcfCrDXXV7jhc/edit?usp=sharing"],
+        ["YouTube", "https://www.youtube.com/channel/UCwBr1b2fAeCKThPWN6FYL1w"],
+        ["Twitch", "https://www.twitch.tv/bigboygamesofficial"],
+        ["Twitter", "https://twitter.com/BBGamesTeam"],
+        ["TikTok", "https://www.tiktok.com/@bigboygamesofficial"],
+        ["Instagram", "https://www.instagram.com/bigboygamesofficial/"],
+        ["Starground on Steam", "https://store.steampowered.com/app/2793380/Starground/"]
+    ]
+}
