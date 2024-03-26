@@ -25,7 +25,7 @@ export default class Util {
         const pathParts = path.split(/[\\\/]/);
         
         // Remove any empty parts resulting from multiple separators
-        const cleanedParts = pathParts.filter(part => part.trim() !== '');
+        const cleanedParts = pathParts.filter(part => {return part.trim() !== ""});
     
         return (cleanedParts.length > 0) ? cleanedParts[cleanedParts.length - 1] : null
     }

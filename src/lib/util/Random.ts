@@ -104,15 +104,15 @@ export class Random {
 
     // Validate not null
     private static validateNotNull(x: object) {
-        if (x === null || x === undefined) {
+        if (x === null || x === undefined) 
             throw new TypeError("Argument must not be undefined")
-        }
+        
     }
 
     // throw an exception unless 0 <= lo <= hi <= length
     private static validateSubarrayIndices(lo: number, hi: number, length: number) {
-        if (lo < 0 || hi > length || lo > hi) {
+        if (lo < 0 || hi > length || lo > hi) 
             throw new TypeError("Subarray indices out of bounds: [" + lo + ", " + hi + ")");
-        }
+        
     }
 }
