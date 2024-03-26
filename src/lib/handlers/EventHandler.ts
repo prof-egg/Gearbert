@@ -60,7 +60,7 @@ export default class EventHandler {
             let filesLoaded = 0;
             Debug.log(`Loading ${jsfiles.length} files from ${folderName}...`, loggerID, EColorEscape.YellowFG)
             jsfiles.forEach((file) => {
-                const sucessfulLoad = this.loadEventFile(`${folderPath}\\${file}`)
+                const sucessfulLoad = this.loadEventFile(`${folderPath}/${file}`)
                 if (sucessfulLoad) filesLoaded++
             })
             Debug.log(`Loaded ${filesLoaded} events!`, loggerID)
@@ -68,7 +68,7 @@ export default class EventHandler {
         
         // Recurse on any folders found
         folders.forEach((folder) => {
-            this.loadEventFolder(`${folderPath}\\${folder}`)
+            this.loadEventFolder(`${folderPath}/${folder}`)
         }) 
     }
 
@@ -182,11 +182,11 @@ export class EventFile<Event extends keyof Discord.ClientEvents> {
      * @param {Discord.Client} client - your discord client instace
      */
     public listen(client: Discord.Client): void {
-        if (this.eventData.once) {
-            client.once(this.eventData.event, (...args: Discord.ClientEvents[Event]) => this.execute(client, ...args))
-        } else {
-            client.on(this.eventData.event, (...args: Discord.ClientEvents[Event]) => this.execute(client, ...args))
-        }
+        if (this.eventData.once) 
+            client.once(this.eventData.event, (...args: Discord.ClientEvents[Event]) => {return this.execute(client, ...args)})
+         else 
+            client.on(this.eventData.event, (...args: Discord.ClientEvents[Event]) => {return this.execute(client, ...args)})
+        
     }
 
     private execute(client: Discord.Client, ...args: Discord.ClientEvents[Event]): void {

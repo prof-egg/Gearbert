@@ -63,7 +63,7 @@ export default class CommandHandler {
             let filesLoaded = 0;
             Debug.log(`Loading ${jsfiles.length} files from ${folderName}...`, loggerID, EColorEscape.YellowFG)
             jsfiles.forEach((file) => {
-                const sucessfulLoad = this.loadSlashCommandFile(`${folderPath}\\${file}`)
+                const sucessfulLoad = this.loadSlashCommandFile(`${folderPath}/${file}`)
                 if (sucessfulLoad) filesLoaded++
             })
             Debug.log(`Loaded ${filesLoaded} commands!`, loggerID)
@@ -71,7 +71,7 @@ export default class CommandHandler {
         
         // Recurse on any folders found
         folders.forEach((folder) => {
-            this.loadSlashCommandFolder(`${folderPath}\\${folder}`)
+            this.loadSlashCommandFolder(`${folderPath}/${folder}`)
         }) 
     }
 
