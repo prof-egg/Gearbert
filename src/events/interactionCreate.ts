@@ -4,7 +4,6 @@ import { IEventFunc } from "../lib/handlers/EventHandler"
 import Util from "../lib/util/Util"
 import messageConfig from "../config/messages.json"
 import clientconfig from "../config/client.json"
-import Debug from "../lib/util/Debug"
 
 const eventType = Events.InteractionCreate
 
