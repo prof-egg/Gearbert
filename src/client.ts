@@ -3,17 +3,15 @@ import * as dotenv from "dotenv";
 import EventHandler from "./lib/handlers/EventHandler";
 import Debug  from "./lib/util/Debug";
 import path from "node:path"
-import { keepAlive } from "./scripts/keepAlive";
+import { loadKeepAlive } from "./scripts/keepAlive";
 
-// const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent] });
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-
 const loggerID = path.parse(__filename).base
 
 async function start() {
 
     // Thing to keep render server online
-    keepAlive()
+    loadKeepAlive()
 
     // Configure enviroment variables
     dotenv.config();
