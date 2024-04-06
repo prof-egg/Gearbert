@@ -14,9 +14,9 @@ import fs from "fs"
 import path from "node:path"
 import Debug, { EColorEscape } from "../util/Debug.js"
 import Util from "../util/Util.js";
-import clientconfig from "../../config/client.json"
+import clientconfig from "../../config/client.json" assert { type: 'json' }
 
-const loggerID = path.parse(__filename).base
+const loggerID = path.parse(import.meta.url).base
 
 /**
  * The `CommandHandler` class is a static class meant for handling slash commands.
@@ -35,7 +35,7 @@ export default class CommandHandler {
     private static rest: REST
 
     // <key: commandName, value: SlashCommandFile> 
-    private static slashCommandsCollection: Discord.Collection<string, SlashCommandFile> = new Discord.Collection(); 
+    private static slashCommandsCollection: Discord.Collection<string, SlashCommandFile> = new Discord.Collection();
 
     /**
      * Recursively finds all .ts files in the specified 
@@ -44,35 +44,41 @@ export default class CommandHandler {
      * folder path contains a period.
      * @param {string} folderPath Path to the folder you of files you want to recursively load
      */
-    public static loadSlashCommandFolder(folderPath: string): void {
+    public static loadSlashCommandFolder(folderPath: string): Promise<void> {
+        return new Promise(async (resolve) => {
 
-        // load js files from folder into an array
-        try {
-            const paths = fs.readdirSync(folderPath)
-            var folders = paths.filter(f => {return !f.includes(".")});
-            var jsfiles = paths.filter(f => {return f.split(".").pop() === "js"});
-        } catch (e) {
-            Debug.logError(e as string, loggerID)
-            console.log(e)
-            return 
-        }
+            // load js files from folder into an array
+            try {
+                const paths = fs.readdirSync(folderPath)
+                var folders = paths.filter(f => { return !f.includes(".") });
+                var jsfiles = paths.filter(f => { return f.split(".").pop() === "js" });
+            } catch (e) {
+                Debug.logError(e as string, loggerID)
+                console.log(e)
+                return resolve()
+            }
 
-        // load files in jsfiles array if any
-        if (jsfiles.length > 0) {
-            const folderName = Util.extractFolderName(folderPath);
-            let filesLoaded = 0;
-            Debug.log(`Loading ${jsfiles.length} files from ${folderName}...`, loggerID, EColorEscape.YellowFG)
-            jsfiles.forEach((file) => {
-                const sucessfulLoad = this.loadSlashCommandFile(`${folderPath}/${file}`)
-                if (sucessfulLoad) filesLoaded++
-            })
-            Debug.log(`Loaded ${filesLoaded} commands!`, loggerID)
-        }
-        
-        // Recurse on any folders found
-        folders.forEach((folder) => {
-            this.loadSlashCommandFolder(`${folderPath}/${folder}`)
-        }) 
+            // load files in jsfiles array if any
+            if (jsfiles.length > 0) {
+                const folderName = Util.extractFolderName(folderPath);
+                let filesLoaded = 0;
+                Debug.log(`Loading ${jsfiles.length} files from ${folderName}...`, loggerID, EColorEscape.YellowFG)
+                for (let i = 0; i < jsfiles.length; i++) {
+                    const file = jsfiles[i]
+                    const sucessfulLoad = await this.loadSlashCommandFile(`${folderPath}/${file}`)
+                    if (sucessfulLoad) filesLoaded++
+                }
+                Debug.log(`Loaded ${filesLoaded} commands!`, loggerID)
+            }
+
+            // Recurse on any folders found
+            for (let i = 0; i < folders.length; i++) {
+                const path = `${folderPath}/${folders[i]}`
+                await this.loadSlashCommandFolder(path)
+            }
+
+            resolve()
+        })
     }
 
     /**
@@ -80,39 +86,40 @@ export default class CommandHandler {
      * @param {string} slashCmdFilePath The path to the file you want to load
      * @returns `true` if loaded successfully; `false` otherwise
      */
-    public static loadSlashCommandFile(slashCmdFilePath: string): boolean {
+    public static loadSlashCommandFile(slashCmdFilePath: string): Promise<boolean> {
+        return new Promise(async (resolve) => {
 
-        // Require the file data and store it into the fileData variable
-        try { // if you uncomment the try catch, change the "@returns {NodeRequire}" to "@returns {NodeRequire?}"
-            var slashCmdFileData: TSlashCommandFileData = require(`${process.cwd()}/${slashCmdFilePath}`)
-        } catch (e) {
-            Debug.logError(e as string, loggerID)
-            console.log(e)
-            return false
-        }
+            try { // Import the file data and store it into the fileData variable
+                const filePath = `file://${process.cwd()}/${slashCmdFilePath}`
+                var slashCmdFileData: TSlashCommandFileData = await import(filePath)
+            } catch (e) {
+                Debug.logError(e as string, loggerID)
+                console.log(e)
+                return resolve(false)
+            }
 
-        const fileName = path.parse(slashCmdFilePath).base
+            const fileName = path.parse(slashCmdFilePath).base
 
-        // If file has any obvious setup errors log it and return out of function
-        if (slashCmdFileData.commandFunction === undefined)      { Debug.logError(`${fileName} is missing commandFunction export`, loggerID); return false }
-        if (slashCmdFileData.buildData === undefined)            { Debug.logError(`${fileName} is missing buildData export`, loggerID); return false }
-        if (slashCmdFileData.buildData.name === undefined)       { Debug.logError(`${fileName} is missing .name property in buildData`, loggerID); return false }
-        if (slashCmdFileData.buildData.description === undefined){ Debug.logError(`${fileName} is missing .description property in buildData`, loggerID); return false }
-        if (slashCmdFileData.tags === undefined || !Array.isArray(slashCmdFileData.tags)) 
-                                                                 { Debug.logError(`${fileName} is missing tags export`, loggerID); return false }
+            // If file has any obvious setup errors log it and return out of function
+            if (slashCmdFileData.commandFunction === undefined) { Debug.logError(`${fileName} is missing commandFunction export`, loggerID); return false }
+            if (slashCmdFileData.buildData === undefined) { Debug.logError(`${fileName} is missing buildData export`, loggerID); return false }
+            if (slashCmdFileData.buildData.name === undefined) { Debug.logError(`${fileName} is missing .name property in buildData`, loggerID); return false }
+            if (slashCmdFileData.buildData.description === undefined) { Debug.logError(`${fileName} is missing .description property in buildData`, loggerID); return false }
+            if (slashCmdFileData.tags === undefined || !Array.isArray(slashCmdFileData.tags)) { Debug.logError(`${fileName} is missing tags export`, loggerID); return false }
 
-        // If command has already been loaded log warning
-        if (this.slashCommandsCollection.has(slashCmdFileData.buildData.name)) {
-            Debug.logWarning(`A slash cmd function with the name "${slashCmdFileData.buildData.name}" has already been loaded`, loggerID)
-            return false
-        }
+            // If command has already been loaded log warning
+            if (this.slashCommandsCollection.has(slashCmdFileData.buildData.name)) {
+                Debug.logWarning(`A slash cmd function with the name "${slashCmdFileData.buildData.name}" has already been loaded`, loggerID)
+                resolve(false)
+            }
 
-        // Load command function and tags into their respective collections, using the command name as the key
-        const slashCommand = new SlashCommandFile(slashCmdFileData, fileName)
-        this.slashCommandsCollection.set(slashCmdFileData.buildData.name, slashCommand);
+            // Load command function and tags into their respective collections, using the command name as the key
+            const slashCommand = new SlashCommandFile(slashCmdFileData, fileName)
+            this.slashCommandsCollection.set(slashCmdFileData.buildData.name, slashCommand);
 
-        // Return true for sucessful loading
-        return true
+            // Return true for sucessful loading
+            resolve(true)
+        })
     }
 
     /**
@@ -152,7 +159,7 @@ export default class CommandHandler {
                 Routes.applicationGuildCommands(clientconfig.id, clientconfig.homeGuild.id),
                 { body: commandBodies },
             );
-    
+
             Debug.log(`Successfully refreshed ${commandBodies.length} application (/) commands!`, loggerID, EColorEscape.CyanFG)
 
         } catch (error) {
@@ -185,8 +192,8 @@ export default class CommandHandler {
      * with `client.isReady()`.
      * @param {Discord.Client} client your discord client instance
      */
-    public static cacheData(client: Discord.Client): void { 
-        this.client = client 
+    public static cacheData(client: Discord.Client): void {
+        this.client = client
         if (client.isReady()) {
             this.clientToken = client.token
             this.rest = new REST().setToken(client.token)
@@ -271,7 +278,7 @@ export class SlashCommandFile {
     private buildData: Discord.RESTPostAPIChatInputApplicationCommandsJSONBody;
     private tags: ECommandTags[];
     private fileName: string // used as the Debug loggerID for the command
-    
+
     /**
      * Creates a new `SlashCommandFile` instance.
      * @param {TSlashCommandFileData} fileData the file data returned from *requiring* a js slash command file
@@ -300,7 +307,7 @@ export class SlashCommandFile {
      */
     public hasTag(tag: ECommandTags): boolean {
 
-        for (let i = 0; i < this.tags.length; i++) 
+        for (let i = 0; i < this.tags.length; i++)
             if (this.tags[i] == tag) return true
 
         return false
@@ -314,7 +321,7 @@ export class SlashCommandFile {
     public hasTags(tags: ECommandTags[]): boolean {
 
         // Rewrite so its not O(n^2)
-        for (let i = 0; i < this.tags.length; i++) 
+        for (let i = 0; i < this.tags.length; i++)
             if (!this.hasTag(tags[i])) return false
 
         return true

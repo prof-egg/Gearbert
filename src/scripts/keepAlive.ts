@@ -2,7 +2,7 @@ import http from "http"
 import Debug from "../lib/util/Debug.js"
 import path from "path"
 
-const loggerID = path.parse(__filename).base
+const loggerID = path.parse(import.meta.url).base
 
 // Actual script
 export function keepAlive() {

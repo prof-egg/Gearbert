@@ -1,7 +1,7 @@
 import Discord from "discord.js"
 import Util from "../../lib/util/Util.js";
 import { ECommandTags, ISlashCommandFunc } from "../../lib/handlers/CommandHandler.js";
-import messageconfig from "../../config/messages.json"
+import messageconfig from "../../config/messages.json" assert { type: 'json' }
 
 const commandFunction: ISlashCommandFunc = async (interaction, options, client, loggerID) => {
 

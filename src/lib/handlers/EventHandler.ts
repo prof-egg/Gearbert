@@ -15,7 +15,7 @@ import path from "node:path"
 import Debug, { EColorEscape } from "../util/Debug.js"
 import Util from "../util/Util.js";
 
-const loggerID = path.parse(__filename).base
+const loggerID = path.parse(import.meta.url).base
 
 /**
  * The `EventHandler` class is a static class meant for handling discord client events.
@@ -41,35 +41,40 @@ export default class EventHandler {
      * folder path contains a period.
      * @param {string} folderPath Path to the folder you of files you want to recursively load
      */
-    public static loadEventFolder(folderPath: string): void {
+    public static loadEventFolder(folderPath: string): Promise<void> {
+        return new Promise(async (resolve) => {
+            // load js files from folder into an array
+            try {
+                const paths = fs.readdirSync(folderPath)
+                var folders = paths.filter(f => {return !f.includes(".")});
+                var jsfiles = paths.filter(f => {return f.split(".").pop() === "js"});
+            } catch (e) {
+                Debug.logError(e as string, loggerID)
+                console.log(e)
+                return resolve()
+            }
 
-        // load js files from folder into an array
-        try {
-            const paths = fs.readdirSync(folderPath)
-            var folders = paths.filter(f => {return !f.includes(".")});
-            var jsfiles = paths.filter(f => {return f.split(".").pop() === "js"});
-        } catch (e) {
-            Debug.logError(e as string, loggerID)
-            console.log(e)
-            return
-        }
+            // load files in jsfiles array if any
+            if (jsfiles.length > 0) {
+                const folderName = Util.extractFolderName(folderPath);
+                let filesLoaded = 0;
+                Debug.log(`Loading ${jsfiles.length} files from ${folderName}...`, loggerID, EColorEscape.YellowFG)
+                for (let i = 0; i < jsfiles.length; i++) {
+                    const file = jsfiles[i]
+                    const sucessfulLoad = await this.loadEventFile(`${folderPath}/${file}`)
+                    if (sucessfulLoad) filesLoaded++
+                }
+                Debug.log(`Loaded ${filesLoaded} events!`, loggerID)
+            }
+            
+            // Recurse on any folders found
+            for (let i = 0; i < folders.length; i++) {
+                const path = `${folderPath}/${folders[i]}`
+                await this.loadEventFolder(path)
+            }
 
-        // load files in jsfiles array if any
-        if (jsfiles.length > 0) {
-            const folderName = Util.extractFolderName(folderPath);
-            let filesLoaded = 0;
-            Debug.log(`Loading ${jsfiles.length} files from ${folderName}...`, loggerID, EColorEscape.YellowFG)
-            jsfiles.forEach((file) => {
-                const sucessfulLoad = this.loadEventFile(`${folderPath}/${file}`)
-                if (sucessfulLoad) filesLoaded++
-            })
-            Debug.log(`Loaded ${filesLoaded} events!`, loggerID)
-        }
-        
-        // Recurse on any folders found
-        folders.forEach((folder) => {
-            this.loadEventFolder(`${folderPath}/${folder}`)
-        }) 
+            resolve()
+        })
     }
 
     /**
@@ -77,40 +82,43 @@ export default class EventHandler {
      * @param {string} eventFilePath The path to the file you want to load
      * @returns `true` if loaded successfully; `false` otherwise
      */
-    public static loadEventFile(eventFilePath: string): boolean {
+    public static loadEventFile(eventFilePath: string): Promise<boolean> {
+        return new Promise(async (resolve) => {
 
-        this.validateClientCache()
+            this.validateClientCache()
 
-        // Require the file data and store it into the fileData variable
-        try { // if you uncomment the try catch, change the "@returns {NodeRequire}" to "@returns {NodeRequire?}"
-            var eventFileData: TEventFileData<any> = require(`${process.cwd()}/${eventFilePath}`)
-        } catch (e) {
-            Debug.logError(e as string, loggerID)
-            console.log(e)
-            return false
-        }
+            // Require the file data and store it into the fileData variable
+            try { 
+                const filePath = `file://${process.cwd()}/${eventFilePath}`;
+                var eventFileData: TEventFileData<any> = await import(filePath)
+            } catch (e) {
+                Debug.logError(e as string, loggerID)
+                console.log(e)
+                return resolve(false)
+            }
 
-        const fileName = path.parse(eventFilePath).base
+            const fileName = path.parse(eventFilePath).base
 
-        // If file has any obvious setup errors log it and return out of function
-        if (eventFileData.eventFunction === undefined)   { Debug.logError(`${fileName} is missing eventFunction export`, loggerID); return false }
-        if (eventFileData.eventData === undefined)       { Debug.logError(`${fileName} is missing eventData export`, loggerID); return false }
-        if (eventFileData.eventData.event === undefined) { Debug.logError(`${fileName} is missing .event property in eventData`, loggerID); return false }
-        if (eventFileData.eventData.once === undefined)  { Debug.logError(`${fileName} is missing .once property in eventData`, loggerID); return false }
+            // If file has any obvious setup errors log it and return out of function
+            if (eventFileData.eventFunction === undefined)   { Debug.logError(`${fileName} is missing eventFunction export`, loggerID); resolve(false) }
+            if (eventFileData.eventData === undefined)       { Debug.logError(`${fileName} is missing eventData export`, loggerID); resolve(false) }
+            if (eventFileData.eventData.event === undefined) { Debug.logError(`${fileName} is missing .event property in eventData`, loggerID); resolve(false) }
+            if (eventFileData.eventData.once === undefined)  { Debug.logError(`${fileName} is missing .once property in eventData`, loggerID); resolve(false) }
 
-        // If event has already been loaded log warning
-        if (this.eventsCollection.has(eventFileData.eventData.event)) {
-            Debug.logWarning(`An event file with the event "${eventFileData.eventData.event}" has already been loaded`, loggerID)
-            return false
-        }
-    
-        // Load event function and tags into their respective collections, using the event name as the key
-        const event = new EventFile(eventFileData, fileName)
-        this.eventsCollection.set(eventFileData.eventData.event, event);
-        event.listen(this.client) // activate listener
+            // If event has already been loaded log warning
+            if (this.eventsCollection.has(eventFileData.eventData.event)) {
+                Debug.logWarning(`An event file with the event "${eventFileData.eventData.event}" has already been loaded`, loggerID)
+                resolve(false) 
+            }
+        
+            // Load event function and tags into their respective collections, using the event name as the key
+            const event = new EventFile(eventFileData, fileName)
+            this.eventsCollection.set(eventFileData.eventData.event, event);
+            event.listen(this.client) // activate listener
 
-        // Return true for sucessful loading
-        return true
+            // Return true for sucessful loading
+            resolve(true)
+        })
     }
 
     /**
@@ -189,7 +197,12 @@ export class EventFile<Event extends keyof Discord.ClientEvents> {
         
     }
 
-    private execute(client: Discord.Client, ...args: Discord.ClientEvents[Event]): void {
+    /**
+     * Manually call the event function instead of relying on the `listen()` method.
+     * @param {Discord.Client} client - your discord client instace
+     * @param args {Discord.ClientEvents[Event]} the callback args from the client event
+     */
+    public execute(client: Discord.Client, ...args: Discord.ClientEvents[Event]): void {
         this.function(client, this.fileName, ...args)
     }
 

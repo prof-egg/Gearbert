@@ -6,8 +6,8 @@
  ******************************************************************************/
 
 import Discord, { ColorResolvable } from "discord.js"
-import clientconfig from "../../config/client.json"
-import colorconfig from "../../config/colors.json";
+import clientconfig from "../../config/client.json" assert { type: 'json' }
+import colorconfig from "../../config/colors.json" assert { type: 'json' }
 
 /**
  * The `Util` class provides random

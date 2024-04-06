@@ -2,8 +2,8 @@ import Discord , { Events } from "discord.js"
 import CommandHandler, { ECommandTags } from "../lib/handlers/CommandHandler.js"
 import { IEventFunc } from "../lib/handlers/EventHandler.js"
 import Util from "../lib/util/Util.js"
-import messageConfig from "../config/messages.json"
-import clientconfig from "../config/client.json"
+import messageConfig from "../config/messages.json" assert { type: 'json' }
+import clientconfig from "../config/client.json" assert { type: 'json' }
 
 const eventType = Events.InteractionCreate
 
