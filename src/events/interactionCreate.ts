@@ -1,7 +1,7 @@
 import Discord , { Events } from "discord.js"
-import CommandHandler, { ECommandTags } from "../lib/handlers/CommandHandler"
-import { IEventFunc } from "../lib/handlers/EventHandler"
-import Util from "../lib/util/Util"
+import CommandHandler, { ECommandTags } from "../lib/handlers/CommandHandler.js"
+import { IEventFunc } from "../lib/handlers/EventHandler.js"
+import Util from "../lib/util/Util.js"
 import messageConfig from "../config/messages.json"
 import clientconfig from "../config/client.json"
 

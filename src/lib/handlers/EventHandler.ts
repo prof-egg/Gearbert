@@ -12,8 +12,8 @@
 import Discord, { Events } from "discord.js"
 import fs from "fs"
 import path from "node:path"
-import Debug, { EColorEscape } from "../util/Debug"
-import Util from "../util/Util";
+import Debug, { EColorEscape } from "../util/Debug.js"
+import Util from "../util/Util.js";
 
 const loggerID = path.parse(__filename).base
 

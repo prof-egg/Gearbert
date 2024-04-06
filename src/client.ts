@@ -1,9 +1,9 @@
 import { Client, GatewayIntentBits} from "discord.js";
 import * as dotenv from "dotenv";
-import EventHandler from "./lib/handlers/EventHandler";
-import Debug  from "./lib/util/Debug";
+import EventHandler from "./lib/handlers/EventHandler.js";
+import Debug  from "./lib/util/Debug.js";
 import path from "node:path"
-import { loadKeepAlive } from "./scripts/keepAlive";
+import { loadKeepAlive } from "./scripts/keepAlive.js";
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const loggerID = path.parse(__filename).base

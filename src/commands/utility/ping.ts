@@ -1,7 +1,7 @@
 
 import Discord from "discord.js"
-import Util from "../../lib/util/Util";
-import { ECommandTags, ISlashCommandFunc } from "../../lib/handlers/CommandHandler";
+import Util from "../../lib/util/Util.js";
+import { ECommandTags, ISlashCommandFunc } from "../../lib/handlers/CommandHandler.js";
 
 const commandFunction: ISlashCommandFunc = async (interaction, options, client, loggerID) => {
 

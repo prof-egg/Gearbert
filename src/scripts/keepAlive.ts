@@ -1,5 +1,5 @@
 import http from "http"
-import Debug from "../lib/util/Debug"
+import Debug from "../lib/util/Debug.js"
 import path from "path"
 
 const loggerID = path.parse(__filename).base

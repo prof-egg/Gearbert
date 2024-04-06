@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import CommandHandler from "../lib/handlers/CommandHandler";
+import CommandHandler from "../lib/handlers/CommandHandler.js";
 
 // NOTE: See scripts/keepAlive.ts for layout info
 

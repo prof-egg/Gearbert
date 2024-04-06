@@ -12,8 +12,8 @@
 import Discord, { REST, Routes } from "discord.js"
 import fs from "fs"
 import path from "node:path"
-import Debug, { EColorEscape } from "../util/Debug"
-import Util from "../util/Util";
+import Debug, { EColorEscape } from "../util/Debug.js"
+import Util from "../util/Util.js";
 import clientconfig from "../../config/client.json"
 
 const loggerID = path.parse(__filename).base
