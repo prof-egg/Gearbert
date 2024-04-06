@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/client.js",
+  "type": "module",
   "scripts": {
     "start": "tsc && node .",
     "lint": "npx eslint ./src",
