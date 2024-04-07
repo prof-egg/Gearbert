@@ -1,17 +1,23 @@
 {
     "clientPresence": "Stargound",
     "error": {
-        "commandError": "Sorry this doesn't seem to be working at the moment. Please try again later.",
+        "query": {
+            "badLink": "Sorry! I couldn't find that link!"
+        },
+        "command": { 
+            "processedNonExistentCommand": "Tried to process a command that has not been loaded into the command handler. This is likely due to a desync between registered commands and current command files. Try to run the refresh commands script to potentially solve the issue.",
+            "generalError": "Sorry this doesn't seem to be working at the moment. Please try again later." 
+        },
         "userNoTestingRights": "Sorry! This command is currently in testing!"
     },
-    "links": [
-        ["GDD", "https://docs.google.com/document/d/1ZgudITcZjBL1ZESWd6z1rGSq-IGFlPLcfCrDXXV7jhc/edit?usp=sharing"],
-        ["YouTube", "https://www.youtube.com/channel/UCwBr1b2fAeCKThPWN6FYL1w"],
-        ["Twitch", "https://www.twitch.tv/bigboygamesofficial"],
-        ["Twitter", "https://twitter.com/BBGamesTeam"],
-        ["TikTok", "https://www.tiktok.com/@bigboygamesofficial"],
-        ["Instagram", "https://www.instagram.com/bigboygamesofficial/"],
-        ["Starground on Steam", "https://store.steampowered.com/app/2793380/Starground/"],
-        ["Gearbert Status", "https://stats.uptimerobot.com/UZTUy9jlVe"]
+    "links": [ 
+        {"name": "GDD", "value": "https://docs.google.com/document/d/1ZgudITcZjBL1ZESWd6z1rGSq-IGFlPLcfCrDXXV7jhc/edit?usp=sharing"},
+        {"name": "YouTube", "value": "https://www.youtube.com/channel/UCwBr1b2fAeCKThPWN6FYL1w"},
+        {"name": "Twitch", "value": "https://www.twitch.tv/bigboygamesofficial"},
+        {"name": "Twitter", "value": "https://twitter.com/BBGamesTeam"},
+        {"name": "TikTok", "value": "https://www.tiktok.com/@bigboygamesofficial"},
+        {"name": "Instagram", "value": "https://www.instagram.com/bigboygamesofficial/"},
+        {"name": "Starground on Steam", "value": "https://store.steampowered.com/app/2793380/Starground/"},
+        {"name": "Gearbert Status", "value": "https://stats.uptimerobot.com/UZTUy9jlVe"}
     ]
 }
