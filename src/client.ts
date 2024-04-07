@@ -10,24 +10,20 @@ const loggerID = path.parse(import.meta.url).base
 
 async function start() {
 
+    // Broadcast start message
+    Debug.logStartup("starting client...", loggerID)
+
     // Thing to keep render server online
     loadKeepAlive()
 
     // Configure enviroment variables
     dotenv.config();
-
-    // Login
-    Debug.logStartup("starting client...", loggerID)
-    await client.login(process.env.CLIENT_LOGIN_TOKEN);
     
     // Load events
     EventHandler.cacheClient(client)
     await EventHandler.loadEventFolder("dist/events")
-    
-    // Trigger the "ready" event manually because we await the login first and then
-    // load the events. So the event listener activates after the "ready" event has been
-    // broadcasted. We wouldn't have to do this if we loaded the events first, but
-    // I like the logs better this way.
-    EventHandler.getEvent(Events.ClientReady)?.execute(client, client as Discord.Client<true>)
+
+    // Login
+    await client.login(process.env.CLIENT_LOGIN_TOKEN);
 }
 start()
