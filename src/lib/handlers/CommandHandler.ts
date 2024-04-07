@@ -149,7 +149,8 @@ export default class CommandHandler {
             const slashCommands = this.slashCommandsCollection.values()
             const commandBodies: Discord.RESTPostAPIChatInputApplicationCommandsJSONBody[] = []
             for (const command of slashCommands)
-                commandBodies.push(command.commandBuildData)
+                if (!command.hasTag(ECommandTags.DontRegister))
+                    commandBodies.push(command.commandBuildData)
 
             Debug.logStartup(`Refreshing ${commandBodies.length} application (/) commands...`, loggerID)
             
@@ -385,4 +386,5 @@ export enum ECommandTags {
     Utility,
     Complete,
     Incomplete,
+    DontRegister
 }
