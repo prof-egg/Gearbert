@@ -135,7 +135,7 @@ export default class CommandHandler {
     public static async refreshSlashCommandRegistry(clientToken?: string) {
 
         if (clientToken) {
-            var rest = new REST().setToken("clientToken")
+            var rest = new REST().setToken(clientToken)
         } else {
             this.validateTokenCache()
             clientToken = this.clientToken
@@ -152,7 +152,7 @@ export default class CommandHandler {
                 commandBodies.push(command.commandBuildData)
 
             Debug.logStartup(`Refreshing ${commandBodies.length} application (/) commands...`, loggerID)
-
+            
             // The put method is used to fully refresh all commands in the guild with the current set
             // Route methods return API 
             const data = await rest.put(
