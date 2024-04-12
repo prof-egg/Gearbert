@@ -18,6 +18,6 @@ const buildData = new Discord.SlashCommandBuilder()
             .setRequired(true))
     .toJSON()
 
-const tags: ECommandTags[] = [ECommandTags.Incomplete, ECommandTags.Utility]
+const tags: ECommandTags[] = [ECommandTags.Incomplete, ECommandTags.Useless]
 
 export { commandFunction, buildData, tags }
