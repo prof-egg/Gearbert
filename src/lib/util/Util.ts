@@ -37,11 +37,12 @@ export default class Util {
      * @param {string} message the description of your embed
      * @returns Returns a `Discord.EmbedBuilder` object the title set to `title`, the description set to `message`, and the color set to main embed color.
      */
-    static standardEmbedMessage(title: string, message: string): Discord.EmbedBuilder {
+    static standardEmbedMessage(title: string, message: string, footer?: string): Discord.EmbedBuilder {
+        if (!footer) footer = `${clientconfig.name} v${clientconfig.version}`
         const embed = new Discord.EmbedBuilder()
             .setTitle(title)
             .setDescription(message)
-            .setFooter({ text: `${clientconfig.name} v${clientconfig.version}` })
+            .setFooter({ text: footer })
             .setColor(colorconfig.main as ColorResolvable)
         return embed
     }
