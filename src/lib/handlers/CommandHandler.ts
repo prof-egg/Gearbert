@@ -101,11 +101,11 @@ export default class CommandHandler {
             const fileName = path.parse(slashCmdFilePath).base
 
             // If file has any obvious setup errors log it and return out of function
-            if (slashCmdFileData.commandFunction === undefined) { Debug.logError(`${fileName} is missing commandFunction export`, loggerID); return false }
-            if (slashCmdFileData.buildData === undefined) { Debug.logError(`${fileName} is missing buildData export`, loggerID); return false }
-            if (slashCmdFileData.buildData.name === undefined) { Debug.logError(`${fileName} is missing .name property in buildData`, loggerID); return false }
-            if (slashCmdFileData.buildData.description === undefined) { Debug.logError(`${fileName} is missing .description property in buildData`, loggerID); return false }
-            if (slashCmdFileData.tags === undefined || !Array.isArray(slashCmdFileData.tags)) { Debug.logError(`${fileName} is missing tags export`, loggerID); return false }
+            if (slashCmdFileData.commandFunction === undefined) { Debug.logError(`${fileName} is missing commandFunction export`, loggerID); resolve(false) }
+            if (slashCmdFileData.buildData === undefined) { Debug.logError(`${fileName} is missing buildData export`, loggerID); resolve(false) }
+            if (slashCmdFileData.buildData.name === undefined) { Debug.logError(`${fileName} is missing .name property in buildData`, loggerID); resolve(false)}
+            if (slashCmdFileData.buildData.description === undefined) { Debug.logError(`${fileName} is missing .description property in buildData`, loggerID); resolve(false) }
+            if (slashCmdFileData.tags === undefined || !Array.isArray(slashCmdFileData.tags)) { Debug.logError(`${fileName} is missing tags export`, loggerID); resolve(false) }
 
             // If command has already been loaded log warning
             if (this.slashCommandsCollection.has(slashCmdFileData.buildData.name)) {
