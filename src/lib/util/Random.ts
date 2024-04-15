@@ -82,7 +82,7 @@ export class Random {
      * @throws TypeError if array is null or undefined
      * @throws TypeError if `(low < 0 || high > array.length || low > high)`
      */
-    static shuffle(array: Array<(number | string | boolean | object)>, low: number, high: number): void {
+    static shuffle(array: Array<(number | string | boolean | object)>, low?: number, high?: number): void {
         this.validateNotNull(array);
     
         low = (low === undefined) ? 0 : low
