@@ -5,8 +5,11 @@ import { ECommandTags, ISlashCommandFunc } from "../../lib/handlers/CommandHandl
 
 const commandFunction: ISlashCommandFunc = async (interaction, options, client, loggerID) => {
 
+    // Defer the reply to get more time to respond
     await interaction.deferReply()
 
+    // Get the time difference between the reply
+    // and the original slash command
     const reply = await interaction.fetchReply()
     const clientPing = reply.createdTimestamp - interaction.createdTimestamp
 

@@ -7,21 +7,32 @@ const queryOption = "query"
 
 const commandFunction: ISlashCommandFunc = async (interaction, options, client, loggerID) => {
 
+    // Check if option exists (this code should 
+    // never run though since the option is required)
     const query = options.getString(queryOption)
     if (!query) 
-        return interaction.reply({ embeds: [Util.embedMessage(`Missing ${queryOption} option`)] })
+        return interaction.reply({ embeds: [Util.embedMessage(`Uknown option "${queryOption}"`)] })
     
-    const link = messageconfig.links.find((link) => query == link.name) ?? { name: "Bad Query", value: messageconfig.error.query.badLink}
+    // Try and find the full link based on the query
+    const link = messageconfig.links.find((link) => query == link.name) 
+    // If we cant find the link (though that should never happen)
+    // substitute an error message as a fake link
+    ?? { name: "Bad Query", value: messageconfig.error.query.badLink}
+
     const msg = `**${link.name}:** ${link.value}`
     interaction.reply({ embeds: [Util.embedMessage(msg)] })
 }
 
 const autocomplete: ISlashCommandAutocompleteFunc = async (interaction, options, client, loggerID) => {
+    // Get the user input as they are typing
     const focusedValue = options.getFocused();
+    // Get autocomplete choices that the user will choose from
     const choices = messageconfig.links.map((link) => link.name)
-    const filtered = choices.filter(choice => choice.toLowerCase().startsWith(focusedValue.toLowerCase()));
+    // Filter out choices the choices that dont start with what the user typed
+    const filtered = choices.filter((choice) => choice.toLowerCase().startsWith(focusedValue.toLowerCase()));
+    // Respond with the auto complete suggestions
     await interaction.respond(
-        filtered.map(choice => ({ name: choice, value: choice })),
+        filtered.map((choice) => ({ name: choice, value: choice })),
     );
 }
 
