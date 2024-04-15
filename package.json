@@ -9,11 +9,13 @@
     "lint": "npx eslint ./src",
     "lintfix": "npx eslint ./src --fix",
     "refresh": "tsc && node ./dist/scripts/refreshCommands.js",
+    "links": "tsc && node ./dist/scripts/wikiLinks.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.5",
     "parse-ms": "^4.0.0",
