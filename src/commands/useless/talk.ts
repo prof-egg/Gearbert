@@ -1,6 +1,6 @@
 import Discord from "discord.js"
 import { ECommandTags, ISlashCommandFunc } from "../../lib/handlers/CommandHandler.js";
-import clientconfig from "../../config/client.json" assert { type: 'json' }
+import clientconfig from "../../config/client.json" assert { type: "json" }
 
 const inputOption = "input"
 
@@ -13,9 +13,9 @@ const buildData = new Discord.SlashCommandBuilder()
     .setName("talk")
     .setDescription(`Silly command to make ${clientconfig.name} talk`)
     .addStringOption(option =>
-		option.setName(inputOption)
-			.setDescription('The input to echo back')
-            .setRequired(true))
+		{return option.setName(inputOption)
+			.setDescription("The input to echo back")
+            .setRequired(true)})
     .toJSON()
 
 const tags: ECommandTags[] = [ECommandTags.Incomplete, ECommandTags.Useless]

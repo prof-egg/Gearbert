@@ -1,6 +1,6 @@
 import Discord from "discord.js"
 import { ECommandTags, ISlashCommandAutocompleteFunc, ISlashCommandFunc } from "../../lib/handlers/CommandHandler.js";
-import messageconfig from "../../config/messages.json" assert { type: 'json' }
+import messageconfig from "../../config/messages.json" assert { type: "json" }
 import Util from "../../lib/util/Util.js";
 import Wiki from "../../lib/util/WikiParser.js";
 import path from "node:path"
@@ -16,7 +16,7 @@ const commandFunction: ISlashCommandFunc = async (interaction, options, client, 
     // Get user query
     const query = options.getString(queryOption)
     // Find the wiki object that matches the query
-    const parsedWiki = parsedWikiObjects.find((pw) => pw.title == query)
+    const parsedWiki = parsedWikiObjects.find((pw) => {return pw.title == query})
 
     if (!query) 
         return interaction.reply({ embeds: [Util.embedMessage(`Uknown option "${queryOption}"`)] })
@@ -24,7 +24,7 @@ const commandFunction: ISlashCommandFunc = async (interaction, options, client, 
         return interaction.reply({ embeds: [Util.embedMessage(messageconfig.error.command.generalError)] })
 
     const embed = Util.standardEmbedMessage(parsedWiki.fullTitle + " (Beta Command)", parsedWiki.text, parsedWiki.link)
-        .addFields(...parsedWiki.getTables()[0].asDiscordEmbedFields)
+        .addFields(...parsedWiki.getTablesAsDiscordEmbedFields())
     interaction.reply({ embeds: [embed] })
 }
 
@@ -32,12 +32,12 @@ const autocomplete: ISlashCommandAutocompleteFunc = async (interaction, options,
     // Get the user input as they are typing
     const focusedValue = options.getFocused();
     // Get autocomplete choices that the user will choose from
-    const choices = parsedWikiObjects.map((wikiParsed) => path.parse(wikiParsed.title).base)
+    const choices = parsedWikiObjects.map((wikiParsed) => {return path.parse(wikiParsed.title).base})
     // Filter out choices the choices that dont start with what the user typed
-    const filtered = choices.filter(choice => choice.toLowerCase().startsWith(focusedValue.toLowerCase()));
+    const filtered = choices.filter(choice => {return choice.toLowerCase().startsWith(focusedValue.toLowerCase())});
     // Respond with the auto complete suggestions
     await interaction.respond(
-        filtered.map(choice => ({ name: choice, value: choice })),
+        filtered.map(choice => {return { name: choice, value: choice }}),
     );
 }
 
@@ -45,10 +45,10 @@ const buildData = new Discord.SlashCommandBuilder()
     .setName("wiki")
     .setDescription("Get info from the official starground wiki.")
     .addStringOption((option) =>
-        option.setName(queryOption)
-            .setDescription('Wiki to search for')
+        {return option.setName(queryOption)
+            .setDescription("Wiki to search for")
             .setAutocomplete(true)
-            .setRequired(true))
+            .setRequired(true)})
     .toJSON()
 
 const tags: ECommandTags[] = [ECommandTags.Incomplete, ECommandTags.General]

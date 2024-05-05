@@ -2,8 +2,8 @@ import Discord , { Events } from "discord.js"
 import CommandHandler, { ECommandTags } from "../lib/handlers/CommandHandler.js"
 import { IEventFunc } from "../lib/handlers/EventHandler.js"
 import Util from "../lib/util/Util.js"
-import messageConfig from "../config/messages.json" assert { type: 'json' }
-import clientconfig from "../config/client.json" assert { type: 'json' }
+import messageConfig from "../config/messages.json" assert { type: "json" }
+import clientconfig from "../config/client.json" assert { type: "json" }
 import Debug from "../lib/util/Debug.js"
 
 const eventType = Events.InteractionCreate
@@ -50,7 +50,7 @@ const processAutocomplete: IEventFunc<typeof eventType> = async (client, loggerI
         return
     }
 
-    if(slashCommand.hasAutocomplete()) { slashCommand.autocomplete(interaction, client) }
+    if(slashCommand.hasAutocomplete())  slashCommand.autocomplete(interaction, client) 
 }
 
 const eventFunction: IEventFunc<typeof eventType> = async (client, loggerID, interaction) => {

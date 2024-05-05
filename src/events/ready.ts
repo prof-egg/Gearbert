@@ -2,8 +2,8 @@ import { Events } from "discord.js"
 import CommandHandler from "../lib/handlers/CommandHandler.js"
 import { IEventFunc } from "../lib/handlers/EventHandler.js"
 import Debug from "../lib/util/Debug.js"
-import messageConfig from "../config/messages.json" assert { type: 'json' }
-import clientconfig from "../config/client.json" assert { type: 'json' }
+import messageConfig from "../config/messages.json" assert { type: "json" }
+import clientconfig from "../config/client.json" assert { type: "json" }
 
 const eventType = Events.ClientReady
 

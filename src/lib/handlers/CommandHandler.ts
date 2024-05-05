@@ -14,7 +14,7 @@ import fs from "fs"
 import path from "node:path"
 import Debug, { EColorEscape } from "../util/Debug.js"
 import Util from "../util/Util.js";
-import clientconfig from "../../config/client.json" assert { type: 'json' }
+import clientconfig from "../../config/client.json" assert { type: "json" }
 
 const loggerID = path.parse(import.meta.url).base
 
@@ -149,8 +149,8 @@ export default class CommandHandler {
             const slashCommands = this.slashCommandsCollection.values()
             const commandBodies: Discord.RESTPostAPIChatInputApplicationCommandsJSONBody[] = []
             for (const command of slashCommands)
-                if (!command.hasTag(ECommandTags.DontRegister))
-                    commandBodies.push(command.commandBuildData)
+                {if (!command.hasTag(ECommandTags.DontRegister))
+                    commandBodies.push(command.commandBuildData)}
 
             Debug.logStartup(`Refreshing ${commandBodies.length} application (/) commands...`, loggerID)
             
