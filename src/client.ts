@@ -5,7 +5,7 @@ import Debug  from "./lib/util/Debug.js";
 import path from "node:path"
 import { loadKeepAlive } from "./scripts/keepAlive.js";
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
 const loggerID = path.parse(import.meta.url).base
 
 async function start() {
