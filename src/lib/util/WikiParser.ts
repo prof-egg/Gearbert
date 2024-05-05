@@ -30,9 +30,23 @@ export default class Wiki {
         this.tables = this.parseTables()
     }
 
-
+    /** Returns shallow copy */
     public getTables(): WikiTable[] {
         return [...this.tables]
+    }
+
+    public getTablesAsDiscordEmbedFields(): Discord.APIEmbedField[] {
+        if (this.tables.length == 0)
+            return []
+
+        let allFields: Discord.APIEmbedField[] = []
+        let completedFirstPass = false;
+        this.getTables().forEach((table) => {
+            table.setNewRow(completedFirstPass)
+            allFields.push(...table.asDiscordEmbedFields)
+            completedFirstPass = true;
+        })
+        return allFields;
     }
 
     /***************************************************************************
@@ -48,7 +62,7 @@ export default class Wiki {
         const wikiRegex = /\/wiki\/[^?#:]+$/;
        
         const links = await this.fetchWikiLinks()
-        return links?.filter((link) => link && wikiRegex.test(link))
+        return links?.filter((link) => {return link && wikiRegex.test(link)})
     }
 
     public static async fetchWikiLinks(): Promise<string[] | undefined>  {
@@ -59,7 +73,7 @@ export default class Wiki {
         const $ = cheerio.load(html);
 
         // Find all <a> tags (links) on the page
-        const allLinks = $('a[href]');
+        const allLinks = $("a[href]");
 
         // console.log(allLinks)
         // Regular expression to match strings starting with '/wiki/' and no additional query parameters or fragments
@@ -71,11 +85,11 @@ export default class Wiki {
         // Note: the root link (aka the ROOT_DIR) is not included in any links returned
         const wikiLinks = allLinks.toArray()
             // Chat gpt wrote this one idk what it does ¯\_(ツ)_/¯
-            .map(link => $(link).attr('href') ?? "Error")
+            .map(link => {return $(link).attr("href") ?? "Error"})
             // Filter out links that dont match the regex
-            .filter(href => href && wikiRegex.test(href))
+            .filter(href => {return href && wikiRegex.test(href)})
             // Add the root link infront of the returned wiki sublink
-            .map((link) => this.ROOT_DIR + link)
+            .map((link) => {return this.ROOT_DIR + link})
 
         if (!wikiLinks) return undefined
 
@@ -100,7 +114,7 @@ export default class Wiki {
         const links = await this.fetchMainWikiLinks() ?? [this.ROOT_DIR]
 
         // Map each link to an asynchronous operation (parsing)
-        const parsedPromises = links.map(link => this.parseWikiContent(link));
+        const parsedPromises = links.map(link => {return this.parseWikiContent(link)});
 
         const parsedResults = await Promise.all(parsedPromises);
         return parsedResults;
@@ -120,12 +134,12 @@ export default class Wiki {
         const dataRows = this.$("table tr").map((index, element) => {
             return this.$(element)
             .find("td")
-            .map((i, el) => this.$(el).text().trim()) // Trim whitespace and newlines
+            .map((i, el) => {return this.$(el).text().trim()}) // Trim whitespace and newlines
             .get();
         }).get();
         
         // Unflatted the 1d array of data to a 2d array
-        let stuff = this.to2DArray(dataRows, headers.length) as string[][]
+        const stuff = this.to2DArray(dataRows, headers.length) as string[][]
         stuff.unshift(headers)
 
         return [new WikiTable("", stuff)]
@@ -155,8 +169,8 @@ export default class Wiki {
             const subArray = [];
 
             for (let j = 0; j < n; j++)
-                if (flatArray[i + j] !== undefined)
-                    subArray.push(flatArray[i + j]);
+                {if (flatArray[i + j] !== undefined)
+                    subArray.push(flatArray[i + j]);}
 
             twoDArray.push(subArray);
         }
@@ -176,13 +190,14 @@ class WikiTable {
     /**Discord embeds (and possibly regular bot messages) normalize
      * whitespace, so this will not look pretty in an embed.*/
     public readonly asString: string 
-    /** @example
+    /** Do not mutate values.
+     * @example
      * const parsedWiki = await Wiki.fetchMainWikiLinksAsParsed()[0]
      * const firstTable = parsedWiki.getTables()[0]
      * const embed = new Discord.EmbedBuilder()
      *     .addFields(...firstTable.asDiscordEmbedFields)
      */
-    public readonly asDiscordEmbedFields: Discord.RestOrArray<Discord.APIEmbedField>
+    public readonly asDiscordEmbedFields: Discord.APIEmbedField[]
 
     public constructor(title: string, table: string[][]) {
         this.validate2dArray(table)
@@ -198,17 +213,27 @@ class WikiTable {
         this.asDiscordEmbedFields = this.toDiscordEmbedFields();
     }
 
+    public setNewRow(isNewRow: boolean): void {
+        // the inline property tells wether an embed should be inline
+        // the previous embed, setting this to false will start
+        // a new row of embeds (assuming that the ones that follow
+        // have inline set to true)
+        let firstFieldInSet = this.asDiscordEmbedFields[0]
+        if (firstFieldInSet)
+            firstFieldInSet.inline = !isNewRow;
+    }
+
     // NOTE: Discord embeds normalize whitespace apparently so using this is no go
     private toString() {
         let result = "";
-        const maxLengths = Array.from({ length: this.table[0].length }, () => 0);
-        const border = () => "+" + maxLengths.map(len => "-".repeat(len + 2)).join("+") + "+"
+        const maxLengths = Array.from({ length: this.table[0].length }, () => {return 0});
+        const border = () => {return "+" + maxLengths.map(len => {return "-".repeat(len + 2)}).join("+") + "+"}
 
         // Find maximum length for each column
         for (let i = 0; i < this.table.length; i++) {
-            for (let j = 0; j < this.table[i].length; j++) {
+            for (let j = 0; j < this.table[i].length; j++) 
                 maxLengths[j] = Math.max(maxLengths[j], this.table[i][j].length);
-            }
+            
         }
 
         // Add top border
@@ -224,9 +249,9 @@ class WikiTable {
             result += "\n";
 
             // Add horizontal border between rows
-            if (i < this.table.length - 1) {
+            if (i < this.table.length - 1) 
                 result += border + "\n";
-            }
+            
         }
 
         // Add bottom border
@@ -236,15 +261,15 @@ class WikiTable {
     }
 
     /**Requirs `this.headers` and `this.body` to be laoded first*/
-    private toDiscordEmbedFields(): Discord.RestOrArray<Discord.APIEmbedField> {
+    private toDiscordEmbedFields(): Discord.APIEmbedField[] {
 
-        const fields: Discord.RestOrArray<Discord.APIEmbedField> = []
+        const fields: Discord.APIEmbedField[] = []
 
         for (let headerIndex = 0; headerIndex < this.headers.length; headerIndex++) {
             // One table uses one field per column, in the event of two tables being
             // sent in the same embed message the field of the set not being inline should
             // put this set on another row
-            const inline = (headerIndex == 0) ? false : true
+            const inline = true
 
             const field: Discord.APIEmbedField = { name: this.headers[headerIndex], value: "", inline }
 
