@@ -2,7 +2,8 @@
     "clientPresence": "Stargound",
     "error": {
         "query": {
-            "badLink": "Sorry! I couldn't find that link!"
+            "badLink": "Sorry! I couldn't find that link!",
+            "badFaq": "Sorry! I couldn't find that question!"
         },
         "command": { 
             "processedNonExistentCommand": "Tried to process a command that has not been loaded into the command handler. This is likely due to a desync between registered commands and current command files. Try to run the refresh commands script to potentially solve the issue.",
@@ -19,5 +20,15 @@
         {"name": "Instagram", "value": "https://www.instagram.com/bigboygamesofficial/"},
         {"name": "Starground on Steam", "value": "https://store.steampowered.com/app/2793380/Starground/"},
         {"name": "Gearbert Status", "value": "https://stats.uptimerobot.com/UZTUy9jlVe"}
+    ],
+    "faq": [ 
+        {
+            "name": "How do I get a key for Starground?", 
+            "value": "Starground is still in closed-alpha, and keys are not guaranteed to anyone. If you are interested in playing the alpha, it's required to wait for an alpha testing round. Any announcement about alpha testing will be posted in <#1186989866869850172>."
+        },
+        {
+            "name": "When will Starground be released?", 
+            "value": "I don't like to promise any specific dates since issues can always come up last minute, but currently the planned release date is toward the end of July this year."
+        }
     ]
 }
